@@ -13,11 +13,13 @@ def run_pandas_solution(db_path, output_path):
         orders = pd.read_sql("SELECT * FROM orders", conn)
         items = pd.read_sql("SELECT * FROM items", conn)
 
-        df = customers.merge(sales, on="customer_id", how="inner") \
-                      .merge(orders, on="sales_id", how="inner") \
-                      .merge(items, on="item_id", how="inner")
+        df = customers.merge(sales, on="customer_id") \
+                      .merge(orders, on="sales_id") \
+                      .merge(items, on="item_id")
 
         df = df[(df["age"] >= 18) & (df["age"] <= 35)]
+
+        # Remove NULL quantities
         df = df[df["quantity"].notna()]
 
         result = df.groupby(
@@ -28,8 +30,6 @@ def run_pandas_solution(db_path, output_path):
 
         result.columns = ["Customer", "Age", "Item", "Quantity"]
         result["Quantity"] = result["Quantity"].astype(int)
-        result = result.sort_values(["Customer", "Item"])
-        result = result[["Customer", "Age", "Item", "Quantity"]]
 
         save_to_csv(result, output_path)
 

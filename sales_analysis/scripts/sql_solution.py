@@ -7,6 +7,11 @@ def run_sql_solution(db_path, output_path):
     if conn is None:
         return
 
+    # Debug: check tables
+    print("Tables:", conn.execute(
+        "SELECT name FROM sqlite_master WHERE type='table';"
+    ).fetchall())
+
     query = """
     SELECT 
         c.customer_id AS Customer,
@@ -20,6 +25,7 @@ def run_sql_solution(db_path, output_path):
     WHERE c.age BETWEEN 18 AND 35
     AND o.quantity IS NOT NULL
     GROUP BY c.customer_id, c.age, i.item_name
+    HAVING SUM(o.quantity) > 0
     ORDER BY Customer, Item;
     """
 
